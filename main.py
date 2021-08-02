@@ -54,8 +54,8 @@ def check(update: Update, context: CallbackContext) -> None:
 
 bot = Bot(token=os.environ["TOKEN"])
 
-dispatcher = Dispatcher(bot=bot, update_queue=None, workers=0)
-dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, check))
+dispatcher = Dispatcher(bot=bot, update_queue=None, workers=1)
+dispatcher.add_handler(CommandHandler('check', check))
 
 @app.route("/", methods=["POST"])
 def index() -> Response:
