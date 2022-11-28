@@ -50,7 +50,7 @@ def check(update: Update, context: CallbackContext) -> None:
         for s in sockets:
             num_available += (1 if s['status'] == 'AVAILABLE' else 0)
                
-        context.bot.send_message(chat_id=chat_id, text=f'{num_available} socket(s) available at {address} ({tariff} {currency}/kWh')
+        context.bot.send_message(chat_id=chat_id, text=f'{num_available} socket(s) available at {address} ({tariff} {currency}/kWh)')
 
 
 bot = Bot(token=os.environ["TOKEN"])
