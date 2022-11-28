@@ -41,16 +41,16 @@ def check(update: Update, context: CallbackContext) -> None:
         data = r.json()['data']
         address = data['address']
         sockets = data['evses']
-        #tariffs = sockets[0]['connectors'][0]['tariffs'][0]
+        tariffs = sockets[0]['connectors'][0]['tariffs'][0]
     
-        #tariff = tariffs['price'] + (tariffs['price'] * (tariffs['vat'] / 100))
-        #currency = tariffs['currency']
+        tariff = tariffs['price'] + (tariffs['price'] * (tariffs['vat'] / 100))
+        currency = tariffs['currency']
 
         num_available = 0
         for s in sockets:
             num_available += (1 if s['status'] == 'AVAILABLE' else 0)
                
-        context.bot.send_message(chat_id=chat_id, text=f'{num_available} socket(s) available at {address}')
+        context.bot.send_message(chat_id=chat_id, text=f'{num_available} socket(s) available at {address} ({tariff} {currency}/kWh')
 
 
 bot = Bot(token=os.environ["TOKEN"])
