@@ -61,7 +61,7 @@ def check(update: Update, context: CallbackContext) -> None:
         context.bot.send_message(chat_id=chat_id, text=f'{num_available} socket(s) available at {address} ({tariff})')
 
 application = (
-    Application.builder().token(os.environ["TOKEN"]).updater(None).context_types(context_types).build()
+    Application.builder().token(os.environ["TOKEN"]).updater(None).build()
 )
 application.add_handler(CommandHandler("check", check))
 
