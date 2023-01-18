@@ -5,8 +5,15 @@ import logging
 from flask import Flask, request
 from werkzeug.wrappers import Response
 
-from telegram import Bot, Update
-from telegram.ext import Dispatcher, Filters, CommandHandler, CallbackContext
+from telegram import Update
+from telegram.ext import (
+    Application,
+    CallbackContext,
+    CommandHandler,
+    ContextTypes,
+    ExtBot,
+    TypeHandler,
+)
 
 app = Flask(__name__)
 logging.basicConfig(
@@ -41,31 +48,27 @@ def check(update: Update, context: CallbackContext) -> None:
         data = r.json()['data']
         address = data['address']
         sockets = data['evses']
-        tariffs = {'price':0,'vat':0,'currency':'EUR'}
+        tariff = "costs unknown"
         try:
             tariffs = sockets[0]['connectors'][0]['tariffs'][0]
+            tariff = str(tariffs['price'] + (tariffs['price'] * (tariffs['vat'] / 100))) + tariffs['currency'] + "/kWh"
         except IndexError:
-            logger.warning('Could not retrieve tariff information, defaulting to unknown')
-    
-        tariff = tariffs['price'] + (tariffs['price'] * (tariffs['vat'] / 100))
-        currency = tariffs['currency']
-
+            logger.warning('Could not retrieve tariff information, defaulting to unavailable')
         num_available = 0
         for s in sockets:
             num_available += (1 if s['status'] == 'AVAILABLE' else 0)
                
-        context.bot.send_message(chat_id=chat_id, text=f'{num_available} socket(s) available at {address} ({tariff} {currency}/kWh)')
+        context.bot.send_message(chat_id=chat_id, text=f'{num_available} socket(s) available at {address} ({tariff})')
 
-
-bot = Bot(token=os.environ["TOKEN"])
-
-dispatcher = Dispatcher(bot=bot, update_queue=None, workers=1)
-dispatcher.add_handler(CommandHandler('check', check))
+application = (
+    Application.builder().token(os.environ["TOKEN"]).updater(None).context_types(context_types).build()
+)
+application.add_handler(CommandHandler("check", check))
 
 @app.route("/", methods=["POST"])
 def index() -> Response:
-    dispatcher.process_update(
-        Update.de_json(request.get_json(force=True), bot)
+    application.update_queue.put(
+        Update.de_json(data=request.get_json(force=True), bot=application.bot)
     )
 
     return "", http.HTTPStatus.NO_CONTENT
