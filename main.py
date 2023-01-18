@@ -41,7 +41,11 @@ def check(update: Update, context: CallbackContext) -> None:
         data = r.json()['data']
         address = data['address']
         sockets = data['evses']
-        tariffs = sockets[0]['connectors'][0]['tariffs'][0]
+        tariffs = {'price':0,'vat':0,'currency':'EUR'}
+        try:
+            tariffs = sockets[0]['connectors'][0]['tariffs'][0]
+        except IndexError:
+            logger.warning('Could not retrieve tariff information, defaulting to unknown')
     
         tariff = tariffs['price'] + (tariffs['price'] * (tariffs['vat'] / 100))
         currency = tariffs['currency']
