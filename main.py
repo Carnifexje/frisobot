@@ -5,8 +5,15 @@ import logging
 from flask import Flask, request
 from werkzeug.wrappers import Response
 
-from telegram import Bot, Update
-from telegram.ext import Dispatcher, Filters, CommandHandler, CallbackContext
+from telegram import Update
+from telegram.ext import (
+    Application,
+    CallbackContext,
+    CommandHandler,
+    ContextTypes,
+    ExtBot,
+    TypeHandler,
+)
 
 app = Flask(__name__)
 logging.basicConfig(
@@ -56,16 +63,15 @@ def check(update: Update, context: CallbackContext) -> None:
                
         context.bot.send_message(chat_id=chat_id, text=f'{num_available} socket(s) available at {address} ({tariff} {currency}/kWh)')
 
-
-bot = Bot(token=os.environ["TOKEN"])
-
-dispatcher = Dispatcher(bot=bot, update_queue=None, workers=1)
-dispatcher.add_handler(CommandHandler('check', check))
+application = (
+    Application.builder().token(os.environ["TOKEN"]).updater(None).context_types(context_types).build()
+)
+application.add_handler(CommandHandler("check", check))
 
 @app.route("/", methods=["POST"])
 def index() -> Response:
-    dispatcher.process_update(
-        Update.de_json(request.get_json(force=True), bot)
+    application.update_queue.put(
+        Update.de_json(data=request.get_json(force=True), bot=application.bot)
     )
 
     return "", http.HTTPStatus.NO_CONTENT
