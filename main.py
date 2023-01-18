@@ -5,8 +5,8 @@ import logging
 from flask import Flask, request
 from werkzeug.wrappers import Response
 
-from telegram import Bot, Update, Dispatcher
-from telegram.ext import Filters, CommandHandler, CallbackContext
+from telegram import Bot, Update
+from telegram.ext import Dispatcher, Filters, CommandHandler, CallbackContext
 
 app = Flask(__name__)
 logging.basicConfig(
