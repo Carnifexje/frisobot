@@ -28,7 +28,7 @@ def check(update: Update, context: CallbackContext) -> None:
         r = requests.get(charger)
         logger.info(r.text)
         charger_location_json = r.json()
-        if r.status_code != requests.codes.ok || charger_location_json['features'].len() == 0:
+        if r.status_code != requests.codes.ok or charger_location_json['features'].len() == 0:
             logger.warning('Something went wrong getting the charger location: %s', charger)
             context.bot.send_message(chat_id=chat_id, text="I could not retrieve the location of a charger on the map. Someone needs to look into this!")
             continue
@@ -37,7 +37,7 @@ def check(update: Update, context: CallbackContext) -> None:
         r = requests.get(f'https://oplaadpalen.nl/api/map/location/{charger_ref}')
         logger.info(r.text)
         json_response = r.json()
-        if r.status_code != requests.codes.ok || json_response['status_code'] != 1000:
+        if r.status_code != requests.codes.ok or json_response['status_code'] != 1000:
             logger.warning('Something went wrong getting charger info with reference: %s', charger_ref)
             context.bot.send_message(chat_id=chat_id, text="I could not retrieve the status information of a requested charger. Someone needs to look into this!")
             continue
