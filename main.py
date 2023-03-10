@@ -19,8 +19,8 @@ chat_id = os.environ["CHAT_ID"]
 
 def check(update: Update, context: CallbackContext) -> None:
     chargers_to_check = [
-        'a358ef4a11eb9dc242010a840003f992',
-        '2ba239eb11ed8d8a42010aa40fc000f0',
+        '4a11eb9dc242010a840003f992a358ef',
+        'eb11ed8d8a42010aa40fc000f02ba239',
         'c011ea858042010a840021dde32062d7'
     ]
 
