@@ -27,11 +27,12 @@ def check(update: Update, context: CallbackContext) -> None:
     for charger_ref in chargers_to_check:
         r = requests.get(f'https://oplaadpalen.nl/api/map/location/{charger_ref}')
         logger.info(r.text)
-        if r.status_code != requests.codes.ok:
-            logger.warning('Something went wrong getting the charger info: %s', r.status_code)
-            context.bot.send_message(chat_id=chat_id, text="I could not retrieve the status information of the charger. Someone needs to look into this!")
+        json_response = r.json()
+        if r.status_code != requests.codes.ok || json_response['status_code'] != 1000:
+            logger.warning('Something went wrong getting charger info with reference: %s', charger_ref)
+            context.bot.send_message(chat_id=chat_id, text="I could not retrieve the status information of a requested charger. Someone needs to look into this!")
             continue
-        data = r.json()['data']
+        data = json_response['data']
         address = data['address']
         sockets = data['evses']
         tariff = "costs unknown"
