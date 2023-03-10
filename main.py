@@ -28,7 +28,7 @@ def check(update: Update, context: CallbackContext) -> None:
         r = requests.get(charger)
         logger.info(r.text)
         charger_location_json = r.json()
-        if r.status_code != requests.codes.ok or charger_location_json['features'].len() == 0:
+        if r.status_code != requests.codes.ok or len(charger_location_json['features']) == 0:
             logger.warning('Something went wrong getting the charger location: %s', charger)
             context.bot.send_message(chat_id=chat_id, text="I could not retrieve the location of a charger on the map. Someone needs to look into this!")
             continue
